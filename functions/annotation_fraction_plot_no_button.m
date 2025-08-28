@@ -71,18 +71,13 @@ hold on
 %Plot each fraction
 if ~delete_annotation && ~isbackground
     for i = 1:rows - 1
-        %plot3(x(i,:),z(i,:),y(i,:),'Color',colors(i,:),'LineWidth',0.75)
         plot3(x(i,:),z(i,:),y(i,:),'Color',colors(i,:),'LineWidth',0.75)
     end
-    %plot3(x(rows,:),z(rows,:),y(rows,:),'Color',colors(i,:),'LineWidth',0.75)
+    %plot3(x(rows,:),z(rows,:),y(rows,:),'Color',colors(i,:),'LineWidth',0.5)
     plot3(x(rows,:),z(rows,:),y(rows,:),'Color',colors(i,:),'LineWidth',0.75)
 elseif ~delete_annotation && isbackground
     for i = 1:rows - 1
-        if i ~= 118
-            plot3(x(i,:),z(i,:),y(i,:),'Color',colors(i,:),'LineWidth',0.75)
-        else
-            plot3(x(i,:),z(i,:),y(i,:),'Color',"k",'LineWidth',0.75)
-        end
+        plot3(x(i,:),z(i,:),y(i,:),'Color',colors(i,:),'LineWidth',0.75)
     end
     plot3(x(rows,:),z(rows,:),y(rows,:),'Color',"k",'LineWidth',0.75)
 end

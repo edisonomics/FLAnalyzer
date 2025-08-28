@@ -137,6 +137,7 @@ for i = 1:size(basis,2)
     end
     unique_fracs(logical(indexer_unique_fracs)) = [];
     compare_max(logical(indexer_unique_fracs)) = [];
+
     % Next build each fraction and see which one is the biggest
     sums_fracs = zeros(length(unique_fracs),length(all_peak_tables(1).ft_peaks(1).ft));
     for j = 1:length(unique_fracs)
