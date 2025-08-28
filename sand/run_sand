@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Set the source directory on your scratch disk
+scratch_directory=""
+interp_directory=""
+
+# Set the destination directory on your local machine
+local_directory=""
+
+# Define the keyword to search for
+keyword="Done"
+
+# Iterate through the files in the source directory
+for file in "$interp_directory"/*; do
+    if [ -f "$file" ]; then
+        # Extract the file name without extension
+        filename=$(basename -- "$file")
+        filename_noext="${filename%.*}"
+
+         sand1D.com -in "$file" -x1 10ppm -xn -0.5ppm -simAll 
+
+
+        # Copy the resulting folder to the local directory
+        mkdir "$local_directory/$filename_noext/"
+        cp -r "$scratch_directory/sand0001/"* "$local_directory/$filename_noext/"
+        rm -r "$scratch_directory/sand0001"
+    fi
+done
+
