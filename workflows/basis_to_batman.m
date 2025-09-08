@@ -15,6 +15,29 @@
 % functions
 functions_folder = "path_to_FLAnalyzer_functions";
 addpath(genpath(functions_folder))
+clear functions_folder
+%% Allow for core edisonomics metabolomics toolbox functions to be used
+%{
+    **If on NMRbox, ignore following comments**
+
+    If not on NMRbox, will need to do the same steps but for 
+    metabolomics_toolbox.
+
+    1. Download repository from github:
+    github.com/edisonomics/metabolomics_toolbox
+    2. Open zip and put folder on local machine
+    3. Delete activate_metabolimics_toolbox code below
+    4. Replace with:
+        
+    core_functions_folder = "path_to_core_functions"
+    addpath(genpath(core_functions_folder))
+
+    5. Replace "path_to_core_functions" with the path to the core
+    functions folder
+    ex/"~/metabolomics_toolbox-master/code"
+
+%}
+activate_metabolomics_toolbox
 %% Load the necessary MATLAB variables for outputting to BATMAN
 %{
     Load the .mat file with the variables needed for outputting to BATMAN
@@ -32,7 +55,7 @@ addpath(genpath(functions_folder))
 %}
 % Change '/folder_path_to_save_batman_files/' with the path to the folder where you want the BATMAN input
 % files to be saved
-folder = '/folder_path_to_save_batman_files/';
+batman_folder = '/folder_path_to_save_batman_files/';
 
 % Change this to magnet frequency the data was acquired with. 
 mag_freq = 799.713758637;
@@ -66,8 +89,37 @@ start_end_ppm = [0.1,9.5];
     false
     
 %}
-basis_final = makeBatmanOutputMultipletsFL(X_sand,ppm_ft,all_peak_tables,basis,start_end_ppm,folder,mag_freq,'common_ppm',true);
+basis_final = makeBatmanOutputMultipletsFL(X_sand,ppm_ft,all_peak_tables,basis,start_end_ppm,batman_folder,mag_freq,'common_ppm',true);
 %% Plot the basis set
 annotation_fraction_plot(basis_final,ppm_ft)
-%% 
-basis_synth_norm = makeBatmanOutputSyntheticFits(basis_final2,ppm_ft,folder,799.713758637,false);
+%% Optional Step
+%{
+    If the last input of the below function is true, the BATMAN files will
+    be the exact same as the ones created in the
+    makeBatmanOutputMultipletsFL function above. The integral of each 
+    basis set element equal to one.
+
+    If the last input is false, the BATMAN files created will be so that
+    each basis set element will be divided by the integral of the first
+    basis set element
+%}
+basis_synth_norm = makeBatmanOutputSyntheticFits(basis_final,ppm_ft,batman_folder,mag_freq,false);
+%% Create file of spectra that will be fit
+%{
+    Section below will create the file containing the spectra that will be
+    fit using the metabolite basis set 
+
+%}
+current_folder = pwd;
+
+% Change "path_to_folder_of_ft1_files_to_fit" to path where ft1 files that
+% should be fit is located
+folder_ft1_files_to_fit = "path_to_folder_of_ft1_files_to_fit";
+
+%
+cd(folder_ft1_files_to_fit)
+spectra = load1DPipe();
+[X_fit,ppm_fit] = Setup1D(spectra);
+makeBatmanFileToFit(X_fit,ppm_fit,batman_folder);
+cd(current_folder)
+clear spectra folder_ft1_files_to_fit current_folder
