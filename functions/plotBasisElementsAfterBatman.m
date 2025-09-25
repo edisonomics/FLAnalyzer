@@ -7,6 +7,8 @@ function [easy_plotting,ppm_new] = plotBasisElementsAfterBatman(path_to_results,
 
     - 8.24.25 - Need to increase the resolution of the underlying spectra
     to account for the shifts. Added new input
+
+    - 9.23.25 - Also add the wavelet fit to the output
         
     plotBasisElementsAfterBatman
     
@@ -124,6 +126,7 @@ if final_files == true
         % Add original spectrum and the underlying multiplets original
         easy_plotting(i).original = interp1(ppm,s_fits(i).tables.OriginalSpectrum',ppm_new);
         easy_plotting(i).metabFit = interp1(ppm,s_fits(i).tables.MetabolitesFit',ppm_new);
+        easy_plotting(i).waveletFit = interp1(ppm,s_fits(i).tables.WaveletFit',ppm_new);
         easy_plotting(i).metabolites = zeros(length(metabolites_used),length(ppm_new));
         original_multiplets_loop = zeros(size(original_multiplets,1),length(ppm_new));
         for j = 1:size(original_multiplets,1)
@@ -258,6 +261,7 @@ else
         % Add original spectrum and the underlying multiplets original
         easy_plotting(i).original = interp1(ppm,s_fits(i).tables.OriginalSpectrum',ppm_new);
         easy_plotting(i).metabFit = interp1(ppm,s_fits(i).tables.MetabolitesFit',ppm_new);
+        easy_plotting(i).waveletFit = interp1(ppm,s_fits(i).tables.WaveletFit',ppm_new);
         easy_plotting(i).metabolites = zeros(length(metabolites_used),length(ppm_new));
         original_multiplets_loop = zeros(size(original_multiplets,1),length(ppm_new));
         for j = 1:size(original_multiplets,1)
