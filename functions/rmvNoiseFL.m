@@ -35,9 +35,11 @@ X_NoNoise = zeros(size(X_sand));
 for i = 1:size(X_sand,1)
     [~,peaks_cutoff] = findpeaks(X_sand(i,:),"MinPeakHeight",intensity_cutoff);
     % Return an error if the cutoff is to high
-    if isempty(peaks_cutoff)
-        error('Error. Intensity Cutoff too high. No peaks!')
-    end
+    % if isempty(peaks_cutoff)
+    %     disp("Fraction:")
+    %     disp(i)
+    %     error('Error. Intensity Cutoff too high. No peaks!')
+    % end
     % Get an indexer for all the peaks
     indexer_main = zeros(1,length(all_peak_tables(i).ft_peaks));
     % Loop through each peak
