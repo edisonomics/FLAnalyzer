@@ -46,36 +46,42 @@ mins(:,ppm < ends_ppm(1) | ppm > ends_ppm(2)) = 0;
 mins(:,end_min_idx) = 1;
 index_all_peak_tables = struct;
 sum_over_fractions = zeros(1,length(all_peak_tables(1).ft_peaks(1).ft));
+peak_index_each_fraction = struct;
 for i = 1:size(all_peak_tables,2)
     index_all_peak_tables(i).indexers = zeros(1,length(all_peak_tables(i).ft_peaks));
+    [~, peak_index_each_fraction(i).Peaks_idx] = findpeaks(X(i,:));
+    %peak_index_each_fraction(i).ppm = ppm(peak_index_each_fraction(i).Peaks_idx);
 end
 for j = 1:size(peaks_to_remove_struct,2)
     for k = 1:length(peaks_to_remove_struct(j).fracs)
         %Find the index of the peak in the ppm
         max_idx = peaks_to_remove_struct(j).ppms(k);
-        %Locate the nearest minima surrounding the peak
-        min1_idx = 0;
-        min2_idx =0;
-        for l = max_idx:-1:1
-            if mins(peaks_to_remove_struct(j).fracs(k),l) == 1
-                min1_idx = l;
-                break;
+        [~,ispeak] = ismember(max_idx,peak_index_each_fraction(peaks_to_remove_struct(j).fracs(k)).Peaks_idx);
+        if ispeak > 0
+            %Locate the nearest minima surrounding the peak
+            min1_idx = 0;
+            min2_idx =0;
+            for l = max_idx:-1:1
+                if mins(peaks_to_remove_struct(j).fracs(k),l) == 1
+                    min1_idx = l;
+                    break;
+                end
             end
-        end
-        for l = max_idx:length(ppm)
-            if mins(peaks_to_remove_struct(j).fracs(k),l) == 1
-                min2_idx = l;
-                break;
+            for l = max_idx:length(ppm)
+                if mins(peaks_to_remove_struct(j).fracs(k),l) == 1
+                    min2_idx = l;
+                    break;
+                end
             end
+            % new structure field will be a structure. Each row corresponds to
+            % each fraction the peak is in
+            indexer2 = 1:size(all_peak_tables(peaks_to_remove_struct(j).fracs(k)).each_table,1);
+            multiple_sand = indexer2(all_peak_tables(peaks_to_remove_struct(j).fracs(k)).each_table.freq_ppm > ppm(min1_idx) & all_peak_tables(peaks_to_remove_struct(j).fracs(k)).each_table.freq_ppm < ppm(min2_idx));
+            for l = 1:length(multiple_sand)
+                sum_over_fractions = sum_over_fractions + all_peak_tables(peaks_to_remove_struct(j).fracs(k)).ft_peaks(multiple_sand(l)).ft;
+            end
+            index_all_peak_tables(peaks_to_remove_struct(j).fracs(k)).indexers(multiple_sand) = 1;
         end
-        % new structure field will be a structure. Each row corresponds to
-        % each fraction the peak is in
-        indexer2 = 1:size(all_peak_tables(peaks_to_remove_struct(j).fracs(k)).each_table,1);
-        multiple_sand = indexer2(all_peak_tables(peaks_to_remove_struct(j).fracs(k)).each_table.freq_ppm > ppm(min1_idx) & all_peak_tables(peaks_to_remove_struct(j).fracs(k)).each_table.freq_ppm < ppm(min2_idx));
-        for l = 1:length(multiple_sand)
-            sum_over_fractions = sum_over_fractions + all_peak_tables(peaks_to_remove_struct(j).fracs(k)).ft_peaks(multiple_sand(l)).ft;
-        end
-        index_all_peak_tables(peaks_to_remove_struct(j).fracs(k)).indexers(multiple_sand) = 1;
     end
 end
 X_added = sum_over_fractions;

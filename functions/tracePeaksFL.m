@@ -1,4 +1,4 @@
-function [trace_struct] = tracePeaksFL(X_matrix,ppm,vector_row_idx,vector_col_idx,ppm_range_trace_points,percentage_peak_min)
+function [trace_struct] = tracePeaksFL(X_matrix,ppm,vector_row_idx,vector_col_idx,ppm_range_trace_points,percentage_peak_min,is_Driver)
 %{
     Chris Esselman 4.23.25
     Edited log
@@ -21,6 +21,8 @@ function [trace_struct] = tracePeaksFL(X_matrix,ppm,vector_row_idx,vector_col_id
     ppm_range_trace_points     how many ppm points to consider for next peak   
 
     percentage_peak_min        percentage for considering still part of trace
+
+    is_Driver                   Boolean if we are tracing a driver or not
   
 
     Outputs:
@@ -128,9 +130,9 @@ for i = 1:length(vector_row_idx)
         big_counter = big_counter + 1;
     end
 end
-% If a trace has less than 4 add to it the next closest ppm on up and down
-for i = 1:size(trace_struct,2)
-    if length(trace_struct(i).fracs) < 4
+% If a trace has less than 
+if is_Driver
+    for i = 1:size(trace_struct,2)
         if trace_struct(i).fracs(end) + 1 <= size(X_matrix,2)
             trace_struct(i).fracs(end + 1) = trace_struct(i).fracs(end) + 1;
             trace_struct(i).ppms(end + 1) = trace_struct(i).ppms(end);
@@ -138,6 +140,20 @@ for i = 1:size(trace_struct,2)
         if trace_struct(i).fracs(1) - 1 > 0
             trace_struct(i).fracs = [trace_struct(i).fracs(1)-1 trace_struct(i).fracs];
             trace_struct(i).ppms = [trace_struct(i).ppms(1) trace_struct(i).ppms];
+        end
+
+    end
+else
+    for i = 1:size(trace_struct,2)
+        if length(trace_struct(i).fracs) < 2
+            if trace_struct(i).fracs(end) + 1 <= size(X_matrix,2)
+                trace_struct(i).fracs(end + 1) = trace_struct(i).fracs(end) + 1;
+                trace_struct(i).ppms(end + 1) = trace_struct(i).ppms(end);
+            end
+            if trace_struct(i).fracs(1) - 1 > 0
+                trace_struct(i).fracs = [trace_struct(i).fracs(1)-1 trace_struct(i).fracs];
+                trace_struct(i).ppms = [trace_struct(i).ppms(1) trace_struct(i).ppms];
+            end
         end
     end
 end
