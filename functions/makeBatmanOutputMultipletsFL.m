@@ -85,6 +85,19 @@ index_all_peak_tables = struct;
 for i = 1:size(all_peak_tables,2)
     index_all_peak_tables(i).indexers = zeros(1,length(all_peak_tables(i).ft_peaks));
 end
+% Cut down basis to just include the basis elements that were added
+if isfield(basis,"removed_traces")
+    basis = rmfield(basis,"removed_traces");
+end
+idx1 = zeros(1,size(basis,2));
+idx2 = 1:size(basis,2);
+for i = 1:size(basis,2)
+    if isempty(basis(i).correlated_traces)
+        idx1(i) = 1;
+    end
+end
+basis(idx2(logical(idx1))) = [];
+
 basis_final = zeros(size(basis,2),length(all_peak_tables(1).ft_peaks(1).ft));
 
 % Get the current working directory and then cd to the directory where the

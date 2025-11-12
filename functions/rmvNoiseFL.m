@@ -1,4 +1,4 @@
-function [X_NoNoise,all_peak_tables_NoNoise] = rmvNoiseFL(X_sand,ppm_ft,all_peak_tables,intensity_cutoff)
+function [X_NoNoise,all_peak_tables_NoNoise] = rmvNoiseFL(X_sand,ppm_ft,all_peak_tables,intensity_cutoff,sand_end_regions)
 %{
     Chris Esselman 10.8.25
     
@@ -73,6 +73,7 @@ for i = 1:size(X_sand,1)
     for j = 1:length(all_peak_tables_NoNoise(i).ft_peaks)
         X_NoNoise(i,:) = X_NoNoise(i,:) + all_peak_tables_NoNoise(i).ft_peaks(j).ft;
     end
-    X_NoNoise(i,:) = X_NoNoise(i,:) - min(X_NoNoise(i,:));
+    %X_NoNoise(i,:) = X_NoNoise(i,:) - min(X_NoNoise(i,:));
+    X_NoNoise(i,:) = X_NoNoise(i,:) - min(X_NoNoise(i,ppm_ft > sand_end_regions(2) | ppm_ft < sand_end_regions(1)));
 end
 end

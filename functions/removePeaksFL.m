@@ -101,5 +101,6 @@ for i = 1:size(all_peak_tables_removed,2)
         X_loop(j,:) = all_peak_tables_removed(i).ft_peaks(j).ft;
     end
     X_removed(i,:) = sum(X_loop);
+    X_removed(i,:) = X_removed(i,:) - X_removed(i,1);
 end
 end

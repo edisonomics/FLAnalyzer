@@ -1,33 +1,18 @@
-function [all_peak_tables,X_sand] = readInSandFL(path_csv,mag_freq,sweep_width,ppm_ft,sand_end_regions,vector_region_remove)
-    %% Read in the SAND
-    % find the max of a peak that is in ppm range of just noise. Any peak less
-    % than this peak * 1.5 is deleted from the csvs
-    path_csv = convertStringsToChars(path_csv);
-    files = dir([path_csv '/*.csv']);
-    all_peak_tables = struct;
-    for i = 1:size(files,1)
-        all_peak_tables(i).each_table = readtable(fullfile(files(i).folder,files(i).name));
-        % Delete SAND peaks with zero decay
-        all_peak_tables(i).each_table(all_peak_tables(i).each_table.decay_hz == 0,:) = [];
-    end
-    % Get rid of any SAND peaks that we do not want
-    for i = 1:size(all_peak_tables,2)
-        indexer = zeros(1,size(all_peak_tables(i).each_table,1));
-        for k = 1:2:length(vector_region_remove)-1
-            for j = 1:length(indexer)
-                if all_peak_tables(i).each_table.freq_ppm(j) > vector_region_remove(k) && all_peak_tables(i).each_table.freq_ppm(j) < vector_region_remove(k+1)
-                    indexer(j) = 1;
-                end
-            end
-        end
-        all_peak_tables(i).each_table(logical(indexer),:) = [];
-    end
+function [all_peak_tables,X_sand] = makeXFromTables(all_peak_tables,mag_freq,sweep_width,ppm_ft,sand_end_regions)
+
+%{
+    Chris Esselman 11.6.25
+
+    Function to make a X_variable from a given peak tables struct.
+    This is used for more fine focused removal of water
+%}
+    all_peak_tables = rmfield(all_peak_tables,"ft_peaks");
     operating_frequency_mhz = mag_freq;
     sw_hz = sweep_width;
     dw = 1/(sw_hz);
     % td_ = app.td;
     fid_time = length(ppm_ft)/2*dw;
-    X_sand = zeros(size(files,1),length(ppm_ft));
+    X_sand = zeros(size(all_peak_tables,2),length(ppm_ft));
     freq_hz = linspace(-sw_hz, sw_hz, length(ppm_ft));
     reconstructed_ppm = freq_hz / operating_frequency_mhz;
     for i = 1:size(all_peak_tables,2)
@@ -53,17 +38,15 @@ function [all_peak_tables,X_sand] = readInSandFL(path_csv,mag_freq,sweep_width,p
         %X_sand(i,:) = real(composite_spectrum);
         %X_sand(i,:) = interp1(reconstructed_ppm,X_sand(i,:),ppm_ft,'linear');
         X_sand(i,:) = composite_spectrum;
+        %X_sand(i,:) = X_sand(i,:) - min(X_sand(i,:));
         X_sand(i,:) = X_sand(i,:) - min(X_sand(i,ppm_ft > sand_end_regions(2) | ppm_ft < sand_end_regions(1))); 
     end
-    % Make sure the baselines are at the right levels
-    %min_matrix = min(X_sand(:,ppm_ft > sand_end_regions(2)),[],"all");
+    % % Make sure the baselines are at the right levels
+    % min_matrix = min(X_sand(:,ppm_ft > sand_end_regions(2)),[],"all");
     % for i = 1:size(X_sand,1)
-    %     %min_row = min(X_sand(i,ppm_ft > sand_end_regions(2)));
-    %     %diff = min_row - min_matrix;
-    %     %X_sand(i,:) = X_sand(i,:) - diff;
-    %     X_sand(i,:) = X_sand(i,:) - min(X_sand(i,:));
+    %     min_row = min(X_sand(i,ppm_ft > sand_end_regions(2)));
+    %     diff = min_row - min_matrix;
+    %     X_sand(i,:) = X_sand(i,:) - diff;
+    %     %X_sand(i,:) = X_sand(i,:) - min(X_sand(i,:));
     % end
-    
-
-
 end
