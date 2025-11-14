@@ -68,6 +68,9 @@ for i = 1:length(vector_row_idx)
         % Find the closest peak in the next fraction
         [~,closest_next_peak] = min(abs(peak_index_each_fraction(location).Peaks_idx - vector_col_idx(i)));
         % To start, just see if next peak is below a cutoff
+        if isempty(closest_next_peak)
+            break;
+        end
         if (X_matrix(location,peak_index_each_fraction(location).Peaks_idx(closest_next_peak))) > ((X_matrix(vector_row_idx(i),vector_col_idx(i)))*((1/100)*percentage_peak_min)) && ...
                 (abs(peak_index_each_fraction(location).Peaks_idx(closest_next_peak) - vector_col_idx(i)) < ppm_range_trace_points)
             ppm_holder(counter) = peak_index_each_fraction(location).Peaks_idx(closest_next_peak);
@@ -100,6 +103,9 @@ for i = 1:length(vector_row_idx)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Find the closest peak in the next fraction
         [~,closest_next_peak] = min(abs(peak_index_each_fraction(location).Peaks_idx - vector_col_idx(i)));
+        if isempty(closest_next_peak)
+            break;
+        end
         % To start, just see if next peak is below a cutoff
         if (X_matrix(location,peak_index_each_fraction(location).Peaks_idx(closest_next_peak))) > ((X_matrix(vector_row_idx(i),vector_col_idx(i)))*((1/100)*percentage_peak_min)) && ...
                 (abs(peak_index_each_fraction(location).Peaks_idx(closest_next_peak) - vector_col_idx(i)) < ppm_range_trace_points)
