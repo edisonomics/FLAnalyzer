@@ -46,3 +46,9 @@ plot(ppm,easy_mult(1).metabFit,'LineWidth',2,'Color',"r")
 plot(ppm,easy_mult(1).metabolites)
 hold off
 set(gca,'XDir','rev')
+%% Calculate the percent quantified
+% Replace "path_to_Batman_output" with the path to the output of the BATMAN
+% run. ex/ "~/runBATMAN/BatmanOutput/11_Jun_14_06_43"
+output_folder = "path_to_Batman_output";
+
+percent_quantified = calcPercentQuantified(output_folder);
