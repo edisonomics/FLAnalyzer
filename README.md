@@ -3,6 +3,8 @@ Software for analyzing metabolite fraction libraries (mFL)
 
 <img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/390d6169-a463-4733-92ae-fd375da5fa9c" />
 
+Paper doi: https://doi.org/10.64898/2025.12.30.696914
+
 Links for use at protocols.io:
   1. NMR Batch Processing and SAND in NMRPipe - dx.doi.org/10.17504/protocols.io.kqdg3xen1g25/v1
   
