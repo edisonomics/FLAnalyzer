@@ -91,6 +91,7 @@ if final_files == true
     % First get the ppm vector
     ppm = s_fits(1).tables.ppm';
 
+    [multiplet_shifts, mult_data] = sync_datasets(multiplet_shifts, mult_data);
     % Preallocate a matrix to hold the original multiplet locations
     original_multiplets = zeros(size(multiplet_shifts,1),length(ppm));
 
@@ -277,4 +278,63 @@ else
     end
 
 end
+end
+function [clean_shifts, clean_data] = sync_datasets(multiplet_shifts, mult_data)
+    % SYNC_DATASETS Synchronizes two datasets by keeping only common rows.
+    %
+    % Inputs:
+    %   multiplet_shifts: Table from MultipletsPpmShifts.txt 
+    %                     (Assumes Col 1 is the ID like 'metabolite1_2.433')
+    %   mult_data:        Table from multi_data.dat 
+    %                     (Assumes Col 1 is Name, Col 2 is PPM Shift)
+    %
+    % Outputs:
+    %   clean_shifts:     The filtered multiplet_shifts variable
+    %   clean_data:       The filtered mult_data variable
+
+    % 1. Extract Keys from multiplet_shifts (The Reference)
+    % We assume the first column contains the ID strings (e.g., 'metabolite1_2.433')
+    if istable(multiplet_shifts)
+        keys1_raw = multiplet_shifts{:, 1};
+    else
+        keys1_raw = multiplet_shifts(:, 1);
+    end
+    % Ensure it is a cell array of strings for comparison
+    keys1 = cellstr(string(keys1_raw));
+
+    % 2. Construct Keys for mult_data to match the format of keys1
+    % We assume Col 1 is Name and Col 2 is the numeric PPM shift.
+    if istable(mult_data)
+        names = mult_data{:, 1};
+        ppms = mult_data{:, 2};
+    else
+        names = mult_data(:, 1);
+        % Handle case where column 2 might be cell or matrix
+        if iscell(mult_data(:, 2))
+            ppms = cell2mat(mult_data(:, 2));
+        else
+            ppms = mult_data(:, 2);
+        end
+    end
+
+    % Pre-allocate cell array for keys
+    keys2 = cell(length(names), 1);
+    
+    % Format each row as 'Name_PPM' (rounded to 3 decimals to match file 1)
+    for i = 1:length(names)
+        keys2{i} = sprintf('%s_%.3f', string(names{i}), ppms(i));
+    end
+
+    % 3. Find the Intersection (Common Rows)
+    % 'stable' keeps the original order of multiplet_shifts
+    [~, idx1, idx2] = intersect(keys1, keys2, 'stable');
+
+    % 4. Filter the variables to make them the same size
+    multiplet_shifts = multiplet_shifts(idx1, :);
+    mult_data = mult_data(idx2, :);
+
+    % Assign to outputs
+    clean_shifts = multiplet_shifts;
+    clean_data = mult_data;
+
 end

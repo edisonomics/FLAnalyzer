@@ -1,9 +1,11 @@
-function [all_peak_tables,X_sand] = readInSandFL(path_csv,mag_freq,sweep_width,ppm_ft,sand_end_regions,vector_region_remove)
+function [all_peak_tables,X_sand,files] = readInSandFL(path_csv,mag_freq,sweep_width,ppm_ft,sand_end_regions,vector_region_remove)
     %% Read in the SAND
     % find the max of a peak that is in ppm range of just noise. Any peak less
     % than this peak * 1.5 is deleted from the csvs
     path_csv = convertStringsToChars(path_csv);
     files = dir([path_csv '/*.csv']);
+    [~, reindex] = sort( str2double( regexp( {files.name}, '\d+', 'match', 'once' )));
+    files = files(reindex);
     all_peak_tables = struct;
     for i = 1:size(files,1)
         all_peak_tables(i).each_table = readtable(fullfile(files(i).folder,files(i).name));
