@@ -131,7 +131,7 @@ end
 % If a trace has less than 4 add to it the next closest ppm on up and down
 for i = 1:size(trace_struct,2)
     if length(trace_struct(i).fracs) < 4
-        if trace_struct(i).fracs(end) + 1 <= size(X_matrix,2)
+        if trace_struct(i).fracs(end) + 1 <= size(X_matrix,1)
             trace_struct(i).fracs(end + 1) = trace_struct(i).fracs(end) + 1;
             trace_struct(i).ppms(end + 1) = trace_struct(i).ppms(end);
         end
