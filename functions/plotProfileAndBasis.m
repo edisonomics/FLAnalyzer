@@ -26,6 +26,8 @@ function plotProfileAndBasis(path_to_NMRdata_txt,path_to_PureSpectraTemplate)
 % Read in NMRdata.txt
 profiling_data = readtable(path_to_NMRdata_txt);
 
+current_folder = pwd;
+cd(path_to_PureSpectraTemplate);
 % Read in Basis Pure Spectra Template
 filePattern = fullfile(path_to_PureSpectraTemplate, 'metabolite*.txt');
 p_listing = dir(filePattern);
@@ -37,6 +39,7 @@ for i = 1:size(p_listing,1)
     p_spec(i).tables = readtable(p_listing(i).name);
 end
 warning(w);
+cd(current_folder)
 % Get the ppm for the profiling data and the basis
 ppm_profile = profiling_data.ppm';
 ppm_basis = p_spec(1).tables.Var1';
