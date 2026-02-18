@@ -1,33 +1,33 @@
 function [easy_plotting,ppm_new] = plotBasisElementsAfterBatman(path_to_results,final_files,increase_ppm_size)
-%{
-    Chris Esselman 7.15.25
-    Edited log
-
-    - 7.25.25 - Making it so do not need final files to make the image
-
-    - 8.24.25 - Need to increase the resolution of the underlying spectra
-    to account for the shifts. Added new input
-
-    - 9.23.25 - Also add the wavelet fit to the output
-        
-    plotBasisElementsAfterBatman
-    
-        Make datastructure to easily plot the underlying metabolites for
-        the fitting
- 
-    Inputs:
- 
-    path_to_results -  Path to individual output directory inside of BatmanOutput
-                       directory
-
-    final_files   -   Boolean. True if RelCon.txt file has been made yet
-
-    Increase ppm size - If the ppm size is too small, add increases amount
-    of resolution. Is a number and will multiply the current ppm size
-                        
-     
-    
-%}
+% %{
+%     Chris Esselman 7.15.25
+%     Edited log
+% 
+%     - 7.25.25 - Making it so do not need final files to make the image
+% 
+%     - 8.24.25 - Need to increase the resolution of the underlying spectra
+%     to account for the shifts. Added new input
+% 
+%     - 9.23.25 - Also add the wavelet fit to the output
+% 
+%     plotBasisElementsAfterBatman
+% 
+%         Make datastructure to easily plot the underlying metabolites for
+%         the fitting
+% 
+%     Inputs:
+% 
+%     path_to_results -  Path to individual output directory inside of BatmanOutput
+%                        directory
+% 
+%     final_files   -   Boolean. True if RelCon.txt file has been made yet
+% 
+%     Increase ppm size - If the ppm size is too small, add increases amount
+%     of resolution. Is a number and will multiply the current ppm size
+% 
+% 
+% 
+% %}
 
 %{
     Psuedocode:

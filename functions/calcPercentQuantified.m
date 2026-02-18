@@ -1,21 +1,21 @@
 function percent_quant = calcPercentQuantified(path_to_results)
-    %{
-    Chris Esselman 12.5.25
-    Edited log
-        
-    calcPercentQuantified - Function to calculate the percent of the
-    original spectrum quantified by the BATMAN fit
-    
-    Inputs- 
-
-        path_output - the path to the finished batman run output folder
-         ex/ "~/runBATMAN/BatmanOutput/11_Jun_14_06_43"
-
-    Output - 
-
-        percent_quant - 1xn vector containing the percent quantified for
-        each spectra fit in a single BATMAN run
-    %}
+    % %{
+    % Chris Esselman 12.5.25
+    % Edited log
+    % 
+    % calcPercentQuantified - Function to calculate the percent of the
+    % original spectrum quantified by the BATMAN fit
+    % 
+    % Inputs- 
+    % 
+    %     path_output - the path to the finished batman run output folder
+    %      ex/ "~/runBATMAN/BatmanOutput/11_Jun_14_06_43"
+    % 
+    % Output - 
+    % 
+    %     percent_quant - 1xn vector containing the percent quantified for
+    %     each spectra fit in a single BATMAN run
+    % %}
 
 % Go to directory where output is
 current_folder = pwd;

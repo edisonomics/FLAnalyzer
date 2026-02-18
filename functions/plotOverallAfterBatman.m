@@ -1,22 +1,22 @@
 function plotOverallAfterBatman(path_to_results,which_fit)
-    %{
-    Chris Esselman 8.28.25
-    Edited log
-        
-    plotOverallAfterBatman - Function to inspect BATMAn fits. Will plot the
-    original spectrum, metabolite fit, and wavelet fit
-    
-    Inputs- 
-
-        path_output - the path to the finished batman run output folder
-         ex/ "~/runBATMAN/BatmanOutput/11_Jun_14_06_43"
-
-    Optional-
-        which_fit - an integer saying which fit to visualize. The default
-        is 1. If fitting more than one spectrum, can change number
-         ex/ If fit 10 spectra, an input of 8 will visualize the eighth
-         spectra
-    %}
+    % %{
+    % Chris Esselman 8.28.25
+    % Edited log
+    % 
+    % plotOverallAfterBatman - Function to inspect BATMAn fits. Will plot the
+    % original spectrum, metabolite fit, and wavelet fit
+    % 
+    % Inputs- 
+    % 
+    %     path_output - the path to the finished batman run output folder
+    %      ex/ "~/runBATMAN/BatmanOutput/11_Jun_14_06_43"
+    % 
+    % Optional-
+    %     which_fit - an integer saying which fit to visualize. The default
+    %     is 1. If fitting more than one spectrum, can change number
+    %      ex/ If fit 10 spectra, an input of 8 will visualize the eighth
+    %      spectra
+    % %}
 
 % So I can pass optional arguments
 arguments
