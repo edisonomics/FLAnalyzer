@@ -100,16 +100,28 @@ if final_files == true
     % relative concentrations counter
     relative_concentrations_counter = zeros(size(multiplet_shifts,1),1);
     for i = 1:length(metabolites_used)
-        % Find part of table that matches the metabolite
-        table_loop = mult_data(strcmp(metabolites_used(i),mult_data.Var1),"Var4");
+        % Find part of table that matches the metabolite (Grabbing all columns using :)
+        table_loop = mult_data(strcmp(metabolites_used(i),mult_data.Var1), :);
         for j = 1:height(table_loop)
             counter = counter + 1;
             % Split the string
             indices_mult = strsplit(string(table_loop{j,"Var4"}),',');
+            
+            % Extract original start and end bounds
+            ppm_start = str2double(indices_mult(1));
+            ppm_end = str2double(indices_mult(2));
+            
+            % Shift start and end bounds if user defined a new center
+            if table_loop{j,"Var6"} ~= -50
+                center_shift = table_loop{j,"Var6"} - table_loop{j,"Var2"};
+                ppm_start = ppm_start + center_shift;
+                ppm_end = ppm_end + center_shift;
+            end
+            
             % Get the original from L_matrix
             original_multiplets(counter,:) = l_matrix(:,i)';
             % Make everything outside matrix = 0
-            original_multiplets(counter,ppm < str2double(indices_mult(1)) | ppm > str2double(indices_mult(2))) = 0;
+            original_multiplets(counter,ppm < ppm_start | ppm > ppm_end) = 0;
             % add to relative concentrations counter
             relative_concentrations_counter(counter) = i;
         end
@@ -235,16 +247,28 @@ else
     % relative concentrations counter
     relative_concentrations_counter = zeros(size(multiplet_shifts,1),1);
     for i = 1:length(metabolites_used)
-        % Find part of table that matches the metabolite
-        table_loop = mult_data(strcmp(metabolites_used(i),mult_data.Var1),"Var4");
+        % Find part of table that matches the metabolite (Grabbing all columns using :)
+        table_loop = mult_data(strcmp(metabolites_used(i),mult_data.Var1), :);
         for j = 1:height(table_loop)
             counter = counter + 1;
             % Split the string
             indices_mult = strsplit(string(table_loop{j,"Var4"}),',');
+            
+            % Extract original start and end bounds
+            ppm_start = str2double(indices_mult(1));
+            ppm_end = str2double(indices_mult(2));
+            
+            % Shift start and end bounds if user defined a new center
+            if table_loop{j,"Var6"} ~= -50
+                center_shift = table_loop{j,"Var6"} - table_loop{j,"Var2"};
+                ppm_start = ppm_start + center_shift;
+                ppm_end = ppm_end + center_shift;
+            end
+            
             % Get the original from L_matrix
             original_multiplets(counter,:) = l_matrix(:,i)';
             % Make everything outside matrix = 0
-            original_multiplets(counter,ppm < str2double(indices_mult(1)) | ppm > str2double(indices_mult(2))) = 0;
+            original_multiplets(counter,ppm < ppm_start | ppm > ppm_end) = 0;
             % add to relative concentrations counter
             relative_concentrations_counter(counter) = i;
         end
@@ -286,7 +310,7 @@ function [clean_shifts, clean_data] = sync_datasets(multiplet_shifts, mult_data)
     %   multiplet_shifts: Table from MultipletsPpmShifts.txt 
     %                     (Assumes Col 1 is the ID like 'metabolite1_2.433')
     %   mult_data:        Table from multi_data.dat 
-    %                     (Assumes Col 1 is Name, Col 2 is PPM Shift)
+    %                     (Assumes Col 1 is Name, Col 2 is PPM Shift, Col 6 is User Shift)
     %
     % Outputs:
     %   clean_shifts:     The filtered multiplet_shifts variable
@@ -303,17 +327,20 @@ function [clean_shifts, clean_data] = sync_datasets(multiplet_shifts, mult_data)
     keys1 = cellstr(string(keys1_raw));
 
     % 2. Construct Keys for mult_data to match the format of keys1
-    % We assume Col 1 is Name and Col 2 is the numeric PPM shift.
+    % Use Col 6 (User PPM) if it's not -50, otherwise Col 2 (Default PPM)
     if istable(mult_data)
         names = mult_data{:, 1};
-        ppms = mult_data{:, 2};
+        ppms_default = mult_data{:, 2};
+        ppms_user = mult_data{:, 6};
     else
         names = mult_data(:, 1);
-        % Handle case where column 2 might be cell or matrix
+        % Handle case where columns might be cell or matrix
         if iscell(mult_data(:, 2))
-            ppms = cell2mat(mult_data(:, 2));
+            ppms_default = cell2mat(mult_data(:, 2));
+            ppms_user = cell2mat(mult_data(:, 6));
         else
-            ppms = mult_data(:, 2);
+            ppms_default = mult_data(:, 2);
+            ppms_user = mult_data(:, 6);
         end
     end
 
@@ -322,7 +349,13 @@ function [clean_shifts, clean_data] = sync_datasets(multiplet_shifts, mult_data)
     
     % Format each row as 'Name_PPM' (rounded to 3 decimals to match file 1)
     for i = 1:length(names)
-        keys2{i} = sprintf('%s_%.3f', string(names{i}), ppms(i));
+        % Check if user defined a new center
+        if ppms_user(i) ~= -50
+            active_ppm = ppms_user(i);
+        else
+            active_ppm = ppms_default(i);
+        end
+        keys2{i} = sprintf('%s_%.3f', string(names{i}), active_ppm);
     end
 
     % 3. Find the Intersection (Common Rows)
