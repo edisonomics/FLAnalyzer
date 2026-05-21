@@ -86,15 +86,57 @@ end
 
 % Do the bucketing of the data
 [~,~,chem_interval] = opt_bucket(ppm,X_original,0.2,1);
-figure,plot(ppm,X_original)
-hold on
-xline(chem_interval(:,1))
-hold off
+
+% For each interval in chem_interval, get the order of the best spectra
+sort_matrix = zeros(length(s_fits),size(chem_interval,1));
+%percent_quant_matrix = zeros(length(s_fits),size(chem_interval,1));
+for j = 1:size(chem_interval,1)
+    percent_quant = zeros(1,size(s_fits,2));
+    for i = 1:size(s_fits,2)
+        wave = X_wavelet(i,ppm > chem_interval(j,2) & ppm < chem_interval(j,1));
+        og = X_original(i,ppm > chem_interval(j,2) & ppm < chem_interval(j,1));
+        percent_quant(i) = (1-(sum(wave.^2)/sum(og.^2)))*100;
+    end
+    [percent_quant,sort_order] = sort(percent_quant,'descend');
+    sort_matrix(:,j) = sort_order';
+    %percent_quant_matrix(:,j) = percent_quant';
+end
+
+
 [multiplet_shifts, mult_data, rows_e] = sync_datasets(multiplet_shifts, mult_data,chemShiftPerSpec);
 
+% 1. For each multiplet, find the chem_interval that it belongs to
+% 2. Find the top percentile in multiplet shifts and average
+% 3. Make that row the new start point for chemShiftPerSpec
+% 4. Repeat
+for i = 1:size(mult_data,1)
+    % Find the row where the value is <= Column 1 (high) AND >= Column 2 (low)
+    row_index = find(mult_data{i,"Var2"} <= chem_interval(:, 1) & mult_data{i,"Var2"} >= chem_interval(:, 2));
+    row_index = row_index(1);
+    % Get the top 5 shifts for that index
+    % 2. Calculate the dynamic amount to use (approx. 33%, rounded down)
+    % The max(1, ...) ensures you never try to index '0' spectra if total_spectra is 1 or 2
+    num_to_use = max(1, round(length(s_fits) * 0.1));
+    multshift = median(multiplet_shifts{i,sort_matrix(1:num_to_use,row_index)+1});
+    if multshift == 0
+        continue
+    end
+    multshift = round(multshift + mult_data{i,"Var2"},4);
+    for j = 1:length(s_fits)
+        % Convert the double to a character array so it matches the table's data type
+        chemShiftPerSpec{rows_e(i), j+2} = {multshift};
+    end
+end
+% 1. Extract just the folder path (ignoring the file name and extension)
+[output_folder, ~, ~] = fileparts(path_to_chemShiftPerSpec);
 
+% 2. Combine that cleanly extracted folder with your new file name
+output_filepath = fullfile(output_folder, 'chemShiftPerSpec_edit.csv');
 
-
+% 3. Write the updated table to that exact location
+writetable(chemShiftPerSpec, output_filepath);
+% Print a formatted success message to the Command Window
+fprintf('Success! The file chemShiftPerSpec_edit.csv was written to:\n%s\n', output_filepath);
 end
 
 function [clean_shifts, clean_data, rows_to_edit] = sync_datasets(multiplet_shifts, mult_data, chemShiftPerSpec)
